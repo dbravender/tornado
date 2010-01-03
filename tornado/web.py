@@ -883,8 +883,8 @@ class Application(object):
         """Appends the given handlers to our handler list."""
         if not host_pattern.endswith("$"):
             host_pattern += "$"
+        host_pattern = re.compile(host_pattern)
         handlers = []
-        self.handlers.append((re.compile(host_pattern), handlers))
 
         for handler_tuple in host_handlers:
             assert len(handler_tuple) in (2, 3)
@@ -897,6 +897,14 @@ class Application(object):
             if not pattern.endswith("$"):
                 pattern += "$"
             handlers.append((re.compile(pattern), handler, kwargs))
+
+        for hostinfo in self.handlers:
+            if hostinfo[0] == host_pattern:
+                hostinfo[1].extend(handlers)
+                return
+
+        self.handlers.append((re.compile(host_pattern), handlers))
+
 
     def add_transform(self, transform_class):
         """Adds the given OutputTransform to our transform list."""
