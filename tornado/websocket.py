@@ -59,6 +59,10 @@ class WebSocketHandler(tornado.web.RequestHandler):
     def __init__(self, application, request):
         tornado.web.RequestHandler.__init__(self, application, request)
         self.stream = request.connection.stream
+        self.stream.set_close_callback(self.on_connection_close)
+
+    def on_connection_close(self):
+        pass
 
     def _execute(self, transforms, *args, **kwargs):
         if self.request.headers.get("Upgrade") != "WebSocket" or \
