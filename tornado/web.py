@@ -1045,10 +1045,16 @@ class Application(object):
         # precedence than the more-precise handlers added later.
         # If a wildcard handler group exists, it should always be last
         # in the list, so insert new groups just before it.
-        if self.handlers and self.handlers[-1][0].pattern == '.*$':
-            self.handlers.insert(-1, (re.compile(host_pattern), handlers))
+
+        if host_pattern in [x[0].pattern for x in self.handlers]:
+            for handler in self.handlers:
+                if handler[0].pattern == host_pattern:
+                    handlers = handler[1]
         else:
-            self.handlers.append((re.compile(host_pattern), handlers))
+            if self.handlers and self.handlers[-1][0].pattern == '.*$':
+                self.handlers.insert(-1, (re.compile(host_pattern), handlers))
+            else:
+                self.handlers.append((re.compile(host_pattern), handlers))
 
         for spec in host_handlers:
             if type(spec) is type(()):
